@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, {Component} from 'react';
 import ReactDom from 'react-dom';
 import YSearch from 'youtube-api-search';
@@ -19,20 +20,26 @@ class App extends Component{
             videos : [],
             selectedVideo: null 
         };
+        this.videoSearch('tekken');
 
-        YSearch({key:API_KEY, term:'tekken'}, (videos) => {
+    }
+
+    videoSearch(term){
+        YSearch({key:API_KEY, term: term}, (videos) => {
             this.setState({ 
                 videos : videos,
                 selectedVideo : videos[0]
             }); 
         });
-        
     }
 
     render(){
+        // debouncd. 300ms마다 함수호출
+        const videoSearch = _.debounce((term)=> {this.videoSearch(term)},300);
+
         return (
             <div>
-                <SearchBar />
+                <SearchBar onSearchTermChange={videoSearch} />
                 <VideoDetail video={this.state.selectedVideo}/>
                 <VideoList
                     onVideoSelect={selectedVideo => this.setState({selectedVideo})}
